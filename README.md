@@ -16,6 +16,15 @@ Bu repo aynı çekirdek ilkeyi ("kıt model ucuz iş yapmaz") koruyup delege kat
 | Context-gathering / keşif | Opus (sınırsız kabul edilir) | Sonnet 5 subagent; saf mekanik yüksek hacimli taramada Haiku 4.5 |
 | Opus'un rolü | Rutin, yüksek hacimli delege | Nadir, açıkça istenen, yargı-ağırlıklı istisna — döngüde asla spawn edilmez |
 | Codex gpt-5.x lanes | Değişmedi | Değişmedi (ayrı abonelik, `codex-fleet`/`omp-fleet` ile) |
+| Trivial iş için subagent | Kural yok | Yasak — tek/iki adımlık işi ana döngü elle yapar (aşağıya bakın) |
+| Büyük ham komut çıktısı | Kural yok | Context'e sokmadan önce dosyaya yaz ve özetle ("Context hygiene") |
+
+### Sonradan eklenen: trivial subagent ve context hygiene kuralları
+
+İlk yayından sonra, aynı hesapta gerçek bir kural ihlali gözlemlendi: bir smoke-test için atılan trivial bir subagent çağrısı, sabit Agent-tool overhead'i yüzünden ~33K token'a mal oldu — işin kendisinden çok daha pahalıya. Bu, politikanın kendi 1. kuralının ("delegasyonun kendi maliyeti var") reflex ihlaliydi. SKILL.md'ye iki kural eklendi:
+
+- **Trivial işe subagent spawn etme** — tek/iki adımlık işi ana döngü elle yapar.
+- **Context hygiene** — büyük ham komut çıktısı context'e girmeden önce dosyaya yazılıp özetlenir; Codex tarafındaki `Invoke-CodexQuiet.ps1` disipliniyle aynı mantık, Claude tarafında henüz otomatik bir sarmalayıcı yok.
 
 ## Kurulum
 
