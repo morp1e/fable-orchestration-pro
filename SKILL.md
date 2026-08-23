@@ -43,6 +43,16 @@ not just the main loop.
    synthesis, judgment calls — done in the main loop (Sonnet), same as
    upstream. Mechanical, scoped, parallelizable work gets delegated to
    Sonnet/Haiku readers or Codex execution lanes.
+4. **Don't spawn a subagent for a single trivial step.** Every Agent-tool
+   call pays a large fixed overhead — the full system prompt and tool schema
+   set are resent before any real work happens — regardless of how small the
+   task is. A measured example: a two-tool-call "list this directory, read
+   one file's frontmatter" task cost ~33K tokens on fixed overhead alone, far
+   more than the work itself. Reserve subagents for genuinely parallelizable,
+   multi-step, or context-isolating work; do a one- or two-tool-call task
+   inline in the main loop instead. This is the same principle as rule 1
+   (delegation has its own cost) applied to the trivial-task case
+   specifically, because it's easy to violate by reflex.
 
 ## Choosing the delegate
 
@@ -66,6 +76,19 @@ not just the main loop.
 Rule of thumb: **context gathering → Sonnet (Haiku for pure mechanical
 volume); execution once the spec is complete → Codex; judgment / synthesis /
 spec-writing → the main loop; Opus → rare, named exceptions only.**
+
+## Context hygiene
+
+Large raw tool output (a long diff, a verbose command dump, a multi-KB file
+compare) that lands directly in the main loop's context stays there for the
+rest of the session and gets resent on every subsequent turn — it doesn't
+decay. Before letting a command's raw output flow into context, prefer
+capturing it to a temp file and summarizing the relevant lines, especially
+for anything over a few hundred lines. This mirrors the discipline
+`Invoke-CodexQuiet.ps1` already enforces on the Codex side of this vault
+(compact JSON telemetry instead of raw transcript into the parent);
+Claude-side sessions don't yet have an equivalent wrapper, so this has to be
+done by hand for now.
 
 ## Exceptions
 
