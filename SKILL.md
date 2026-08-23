@@ -13,10 +13,16 @@ Upstream source: [`avenoxai/avenoxskills/skills/fable-orchestration`](https://gi
 The upstream policy is written for a **Claude Max ($200/mo)** stack, where Opus
 is described as an "unlimited" delegate tier. On **Claude Pro ($20/mo)** —
 what this account actually runs, no `ANTHROPIC_API_KEY` fallback — Opus is
-**not unlimited**. Its quota is materially tighter than Sonnet's (shorter
-5h/weekly caps), so treating it as a cheap high-fan-out reader burns the
-account's scarcest budget on recon instead of judgment. Everything below is
-the upstream rule set with that one assumption replaced.
+**not unlimited**. Every paid plan has three limit dimensions: a shared
+five-hour session window, a weekly cap across all models, and a **separate
+weekly cap on Opus specifically** ([Anthropic — usage limit best
+practices](https://support.claude.com/en/articles/9797557-usage-limit-best-practices)).
+Opus doesn't get its own shorter 5h window — it shares the same session
+clock as Sonnet — but it burns both the shared 5h budget and its own weekly
+budget faster because it costs more per message. On Pro's smaller overall
+allowance, that combination makes treating Opus as a cheap high-fan-out
+reader burn the account's scarcest budget on recon instead of judgment.
+Everything below is the upstream rule set with that one assumption replaced.
 
 Core law unchanged: **the scarce tier does not do pleb work, and is not
 spawned aggressively as a sub-agent.** On Pro, "scarce" now means Opus itself,
