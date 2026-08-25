@@ -28,13 +28,54 @@ Bu repo aynı çekirdek ilkeyi ("kıt model ucuz iş yapmaz") koruyup delege kat
 
 ## Kurulum
 
-`SKILL.md` dosyasını Claude Code'un skill dizinine kopyalayın:
+### Ön koşullar
 
-```
-~/.claude/skills/fable-orchestration/SKILL.md
+| Gereksinim | Neden |
+|---|---|
+| Claude Code (CLI) | Skill'ler Claude Code özelliğidir |
+| **Claude Pro ($20/ay) planı** | Politikanın tamamı Pro kotasına göre yazıldı. Max planındaysanız [upstream sürümü](https://github.com/avenoxai/avenoxskills) kullanın |
+| `codex-fleet` / `omp-fleet` — **opsiyonel** | Politika Codex lane'lerine yönlendirme yapar. Bu skill'ler yoksa Codex kuralları basitçe uygulanmaz; geri kalan (Opus/Sonnet/Haiku yönlendirmesi, trivial-subagent yasağı, context hygiene) çalışır. Kurulum bunlara bağlı değildir |
+
+### Kur
+
+```bash
+mkdir -p ~/.claude/skills/fable-orchestration
+# SKILL.md dosyasını bu dizine kopyalayın:
+#   ~/.claude/skills/fable-orchestration/SKILL.md
 ```
 
-Proje bazlı, harness-agnostic bir kuruluma ihtiyacınız varsa `.agents/skills/fable-orchestration/SKILL.md` altına da konabilir (SKILL.md okuyan herhangi bir harness için).
+Proje bazlı, harness-agnostic bir kurulum için `.agents/skills/fable-orchestration/SKILL.md`
+altına da konabilir (SKILL.md okuyan herhangi bir harness için).
+
+> **İlk kurulumda dikkat.** Claude Code skill dizinlerini canlı izler; mevcut bir
+> `~/.claude/skills/` içine dosya eklerseniz oturumu yeniden başlatmanız gerekmez.
+> Ancak `~/.claude/skills/` dizini oturum başladığında **hiç yoksa** ve siz onu
+> yeni yarattıysanız, Claude Code onu izlemeye alabilmek için **yeniden başlatılmalıdır.**
+> İlk kez skill kuran herkes bu duruma düşer.
+
+### Kurulduğunu doğrulayın
+
+Bu skill görünmez bir yönlendirme politikasıdır — çalıştığını kendiliğinden fark etmezsiniz.
+Üç adımla doğrulayın:
+
+1. **Listede görünüyor mu?** Yeni bir Claude Code oturumunda `/` yazın ve menüde
+   `fable-orchestration` girdisini arayın. Görünmüyorsa dosya yolu yanlıştır
+   (`SKILL.md` adı ve dizin adı birebir olmalı).
+
+2. **Doğrudan çağırın:** `/fable-orchestration` yazın. Skill içeriği yüklenmelidir.
+
+3. **Otomatik tetiklendiğini görün:** Yeni bir oturumda şunu sorun —
+
+   ```
+   Bu işi hangi modele delege etmeliyim?
+   ```
+
+   Skill yüklüyse Claude bu kararı politikaya göre verir: ana döngü Sonnet 5'te kalır,
+   Opus rutin delege olarak spawn edilmez, ve trivial iş için subagent açılmaz.
+   Bu üçü olmuyorsa skill devrede değildir.
+
+> **Kaldırmak için** `~/.claude/skills/fable-orchestration/` dizinini silin.
+> Değişiklik oturum içinde algılanır.
 
 ## Doğrulama durumu
 
